@@ -39,6 +39,8 @@ DEFAULT_UPPER_FREQ = 2483
 MIN_FREQ = 2300
 MAX_FREQ = 2600
 
+
+
 class SpecanThread(threading.Thread):
     def __init__(self, device, low_frequency, high_frequency, new_frame_callback, ubertooth_device=-1):
         threading.Thread.__init__(self)
@@ -183,6 +185,11 @@ class RenderArea(QtWidgets.QWidget):
                     pen.setStyle(Qt.DotLine)
                     painter.setPen(pen)
                     painter.drawText(QPointF(x_axis[max_max] + 4, 30), '%.06f' % (self._x_to_hz(x_axis[max_max]) / 1e6))
+                    freq_high = (self._x_to_hz(x_axis[max_max]) / 1e6)
+                    strength_high = self._y_to_dbm(y_max[max_max])
+
+                    print('freq: ', freq_high ,'(' ,strength_high, ' dbm)')
+
                     painter.drawText(QPointF(30, y_max[max_max] - 4), '%d' % (self._y_to_dbm(y_max[max_max])))
                     painter.drawLine(QPointF(x_axis[max_max], 0), QPointF(x_axis[max_max], self.height()))
                     painter.drawLine(QPointF(0, y_max[max_max]), QPointF(self.width(), y_max[max_max]))
