@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python
 #
 # Copyright 2011 Jared Boone
@@ -22,6 +23,8 @@
 import signal
 import sys
 import threading
+from typing import Any, Union
+
 import numpy
 
 from argparse import ArgumentParser
@@ -40,6 +43,10 @@ MIN_FREQ = 2300
 MAX_FREQ = 2600
 
 prev_high = 0
+
+path = '/tmp/ubertooth.fifo'
+flags = os.O_RDWR
+fifo = os.open(path, flags)
 
 
 
@@ -187,11 +194,13 @@ class RenderArea(QtWidgets.QWidget):
                     pen.setStyle(Qt.DotLine)
                     painter.setPen(pen)
                     painter.drawText(QPointF(x_axis[max_max] + 4, 30), '%.06f' % (self._x_to_hz(x_axis[max_max]) / 1e6))
-                    freq_high = (self._x_to_hz(x_axis[max_max]) / 1e6)
+                    freq_high: Union[float, Any] = (self._x_to_hz(x_axis[max_max]) / 1e6)
                     strength_high = self._y_to_dbm(y_max[max_max])
                     global prev_high
                     if(prev_high != freq_high):
-                        print('freq: ', freq_high, '(', strength_high, ' dbm)')
+                        os.write(fifo, freq_high)
+                        #print(sys.getsizeof(freq_high))
+                        #freq_write.write(freq_high)
                     prev_high = freq_high
                     painter.drawText(QPointF(30, y_max[max_max] - 4), '%d' % (self._y_to_dbm(y_max[max_max])))
                     painter.drawLine(QPointF(x_axis[max_max], 0), QPointF(x_axis[max_max], self.height()))
